@@ -7,13 +7,6 @@ pipeline {
         APP_PORT = "4000"
     }
 
-    stages {
-        stage('Clone Repository') {
-            steps {
-                git 'https://github.com/engr-OsamaAliKhan/NodeAPI.git' // Update with your repository URL
-            }
-        }
-
         stage('Read Version') {
             steps {
                 script {
