@@ -7,6 +7,8 @@ pipeline {
         APP_PORT = "4000"
     }
 
+    stages {
+        
         stage('Read Version') {
             steps {
                 script {
