@@ -4,13 +4,13 @@ pipeline {
     environment {
         IMAGE_NAME = "my-node-app"
         CONTAINER_NAME = "my-running-node-app"
-        APP_PORT = "3000"
+        APP_PORT = "4000"
     }
 
     stages {
         stage('Clone Repository') {
             steps {
-                git 'https://your-repo-url.git' // Update with your repository URL
+                git 'https://github.com/engr-OsamaAliKhan/NodeAPI.git' // Update with your repository URL
             }
         }
 
