@@ -21,22 +21,30 @@ pipeline {
                 }
             }
         }
-
-        stage('Build Docker Image') {
-            steps {
-                script {
-                    try {
-                        sh """
-                            echo "Building Docker Image: ${IMAGE_NAME}:${VERSION}"
-                            docker build -t ${IMAGE_NAME}:${VERSION} .
-                        """
-                        echo "Docker image built successfully: ${IMAGE_NAME}:${VERSION}"
-                    } catch (Exception e) {
-                        error "Docker build failed: ${e.message}"
-                    }
+stage('Build Docker Image') {
+    steps {
+        script {
+            try {
+                if (isUnix()) {
+                    // Linux/Mac Commands
+                    sh """
+                        echo "Building Docker Image: ${IMAGE_NAME}:${VERSION}"
+                        docker build -t ${IMAGE_NAME}:${VERSION} .
+                    """
+                } else {
+                    // Windows Commands (PowerShell)
+                    bat """
+                        echo Building Docker Image: ${IMAGE_NAME}:${VERSION}
+                        docker build -t ${IMAGE_NAME}:${VERSION} .
+                    """
                 }
+                echo "Docker image built successfully: ${IMAGE_NAME}:${VERSION}"
+            } catch (Exception e) {
+                error "Docker build failed: ${e.message}"
             }
         }
+    }
+}
 
         stage('Check & Remove Existing Container') {
     steps {
