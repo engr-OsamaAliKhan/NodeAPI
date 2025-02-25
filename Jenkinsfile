@@ -28,7 +28,7 @@ pipeline {
                     try {
                         sh """
                             echo "Building Docker Image: ${IMAGE_NAME}:${VERSION}"
-                            docker build -t ${IMAGE_NAME}:${VERSION} . | tee docker_build.log
+                            docker build -t ${IMAGE_NAME}:${VERSION} .
                         """
                         echo "Docker image built successfully: ${IMAGE_NAME}:${VERSION}"
                     } catch (Exception e) {
@@ -39,27 +39,45 @@ pipeline {
         }
 
         stage('Check & Remove Existing Container') {
-            steps {
-                script {
-                    try {
-                        def containerExists = sh(
-                            script: "docker ps -a --format '{{.Names}}' | grep -w ${CONTAINER_NAME} || true",
-                            returnStdout: true
-                        ).trim()
-                        
-                        if (containerExists) {
-                            echo "Stopping and removing existing container: ${CONTAINER_NAME}"
-                            sh "docker stop ${CONTAINER_NAME} || true"
-                            sh "docker rm ${CONTAINER_NAME} || true"
-                        } else {
-                            echo "No existing container found."
-                        }
-                    } catch (Exception e) {
-                        error "Failed to check/remove container: ${e.message}"
+    steps {
+        script {
+            try {
+                def containerExists
+                if (isUnix()) {
+                    // Linux/Mac Commands
+                    containerExists = sh(
+                        script: "docker ps -a --format '{{.Names}}' | grep -w ${CONTAINER_NAME} || true",
+                        returnStdout: true
+                    ).trim()
+                    
+                    if (containerExists) {
+                        echo "Stopping and removing existing container: ${CONTAINER_NAME}"
+                        sh "docker stop ${CONTAINER_NAME} || true"
+                        sh "docker rm ${CONTAINER_NAME} || true"
+                    } else {
+                        echo "No existing container found."
+                    }
+                } else {
+                    // Windows Commands (PowerShell)
+                    containerExists = bat(
+                        script: "docker ps -a --format \"{{.Names}}\" | findstr /R /C:\"${CONTAINER_NAME}\"",
+                        returnStdout: true
+                    ).trim()
+                    
+                    if (containerExists) {
+                        echo "Stopping and removing existing container: ${CONTAINER_NAME}"
+                        bat "docker stop ${CONTAINER_NAME} || exit /b 0"
+                        bat "docker rm ${CONTAINER_NAME} || exit /b 0"
+                    } else {
+                        echo "No existing container found."
                     }
                 }
+            } catch (Exception e) {
+                error "Failed to check/remove container: ${e.message}"
             }
         }
+    }
+}
 
         stage('Run Container') {
             steps {
