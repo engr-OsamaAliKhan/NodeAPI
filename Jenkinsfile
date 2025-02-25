@@ -88,20 +88,29 @@ stage('Build Docker Image') {
 }
 
         stage('Run Container') {
-            steps {
-                script {
-                    try {
-                        sh """
-                            echo "Starting container: ${CONTAINER_NAME} with version ${VERSION}"
-                            docker run -d -p ${APP_PORT}:${APP_PORT} --name ${CONTAINER_NAME} ${IMAGE_NAME}:${VERSION} | tee container_run.log
-                        """
-                        echo "Container ${CONTAINER_NAME} is running successfully on port ${APP_PORT}."
-                    } catch (Exception e) {
-                        error "Failed to start the container: ${e.message}"
-                    }
+    steps {
+        script {
+            try {
+                if (isUnix()) {
+                    // Linux/macOS Commands
+                    sh """
+                        echo "Starting container: ${CONTAINER_NAME} with version ${VERSION}"
+                        docker run -d -p ${APP_PORT}:${APP_PORT} --name ${CONTAINER_NAME} ${IMAGE_NAME}:${VERSION} | tee container_run.log
+                    """
+                } else {
+                    // Windows Commands (PowerShell)
+                    bat """
+                        echo Starting container: ${CONTAINER_NAME} with version ${VERSION}
+                        docker run -d -p ${APP_PORT}:${APP_PORT} --name ${CONTAINER_NAME} ${IMAGE_NAME}:${VERSION} > container_run.log
+                    """
                 }
+                echo "Container ${CONTAINER_NAME} is running successfully on port ${APP_PORT}."
+            } catch (Exception e) {
+                error "Failed to start the container: ${e.message}"
             }
         }
+    }
+}
     }
 
     post {
