@@ -5,6 +5,7 @@ pipeline {
         IMAGE_NAME = "my-node-app"
         CONTAINER_NAME = "my-running-node-app"
         APP_PORT = "4000"
+        CONTAINER_PORT = "3000"
     }
 
     stages {
@@ -95,13 +96,13 @@ stage('Build Docker Image') {
                     // Linux/macOS Commands
                     sh """
                         echo "Starting container: ${CONTAINER_NAME} with version ${VERSION}"
-                        docker run -d -p ${APP_PORT}:${APP_PORT} --name ${CONTAINER_NAME} ${IMAGE_NAME}:${VERSION} | tee container_run.log
+                        docker run -d -p ${APP_PORT}:${CONTAINER_PORT} --name ${CONTAINER_NAME} ${IMAGE_NAME}:${VERSION} | tee container_run.log
                     """
                 } else {
                     // Windows Commands (PowerShell)
                     bat """
                         echo Starting container: ${CONTAINER_NAME} with version ${VERSION}
-                        docker run -d -p ${APP_PORT}:${APP_PORT} --name ${CONTAINER_NAME} ${IMAGE_NAME}:${VERSION} > container_run.log
+                        docker run -d -p ${APP_PORT}:${CONTAINER_PORT} --name ${CONTAINER_NAME} ${IMAGE_NAME}:${VERSION} > container_run.log
                     """
                 }
                 echo "Container ${CONTAINER_NAME} is running successfully on port ${APP_PORT}."
