@@ -34,7 +34,7 @@ app.get("/", (req, res) => {
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>System Usage V1.0.3</title>
+            <title>System Usage V1.0.4</title>
             <style>
                 body {
                     font-family: Arial, sans-serif;
@@ -62,7 +62,7 @@ app.get("/", (req, res) => {
             </style>
         </head>
         <body>
-            <h1>System Usage</h1>
+            <h1>System Usage V1.0.4</h1>
             <div class="container">
                 <div class="card">
                     <h2>Memory Usage</h2>
